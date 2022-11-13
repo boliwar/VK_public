@@ -6,30 +6,20 @@ from dotenv import load_dotenv
 import random
 
 
-def get_picture(url, filename, payload=None):
-    response = requests.get(url, params=payload)
-    response.raise_for_status()
-
-    with open(filename, 'wb') as file:
-        file.write(response.content)
-
 
 def download_pictures(picture_urls, directory, payload=None):
-    for url in picture_urls:
-        url_components = urllib.parse.urlparse(url)
-        file_path, file_name = os.path.split(url_components.path)
-        get_picture(url, Path(directory, file_name), payload)
-        return Path(directory, file_name)
+    url_components = urllib.parse.urlparse(picture_urls)
+    file_path, file_name = os.path.split(url_components.path)
 
-def get_xkcd_comics(comics_number=None):
-    header_url = f'https://xkcd.com'
-    end_url = f'info.0.json'
-    if comics_number:
-        json_url = "/".join([header_url, comics_number, end_url])
-    else:
-        json_url = "/".join([header_url, end_url])
+    response = requests.get(picture_urls, params=payload)
+    response.raise_for_status()
 
-    response = requests.get(json_url, timeout=30)
+    with open(Path(directory, file_name), 'wb') as file:
+        file.write(response.content)
+    return Path(directory, file_name)
+
+def get_xkcd_comics(comics_url):
+    response = requests.get(comics_url, timeout=30)
     response.raise_for_status()
 
     return response.json()
@@ -42,13 +32,15 @@ def main():
 
     directory = os.getcwd()
     version_api = "5.131"
-    
-    comics = get_xkcd_comics()
+    header_url = f'https://xkcd.com'
+    end_url = f'info.0.json'
+
+    comics = get_xkcd_comics("/".join([header_url, end_url]))
     last_number = int(comics['num'])
 
     comics_number = str(random.randint(1, last_number))
 
-    comics = get_xkcd_comics(comics_number)
+    comics = get_xkcd_comics("/".join([header_url, comics_number, end_url]))
 
     picture_urls = [comics["img"]]
     comment = comics["alt"]
