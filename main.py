@@ -18,8 +18,8 @@ def download_random_comic(picture_urls, directory, payload=None):
         file.write(response.content)
     return Path(directory, file_name)
 
-def get_xkcd_comic(comics_url):
-    response = requests.get(comics_url, timeout=30)
+def get_xkcd_comic(comic_url):
+    response = requests.get(comic_url, timeout=30)
     response.raise_for_status()
 
     return response.json()
@@ -32,19 +32,19 @@ def main():
 
     directory = os.getcwd()
     version_api = "5.131"
-    header_url = f'https://xkcd.com'
-    end_url = f'info.0.json'
+    base_url = f'https://xkcd.com'
+    path_url = f'info.0.json'
 
-    comic = get_xkcd_comic("/".join([header_url, end_url]))
+    comic = get_xkcd_comic("/".join([base_url, path_url]))
     last_number = int(comic['num'])
 
-    comics_number = str(random.randint(1, last_number))
+    comic_number = str(random.randint(1, last_number))
 
-    comic = get_xkcd_comic("/".join([header_url, comics_number, end_url]))
+    comic = get_xkcd_comic("/".join([base_url, comic_number, path_url]))
 
-    picture_urls = [comic["img"]]
+    picture_url = [comic["img"]]
     comment = comic["alt"]
-    picture_file = download_random_comic(picture_urls, directory, payload=None)
+    picture_file = download_random_comic(picture_url, directory, payload=None)
 
     payload = {"access_token": vk_token,
                "v": version_api,
@@ -53,16 +53,16 @@ def main():
     response = requests.get(f'https://api.vk.com/method/photos.getWallUploadServer', params=payload)
     response.raise_for_status()
 
-    preload = response.json()["response"]
-    upload_url = preload['upload_url']
+    from_wall_upload = response.json()["response"]
+    upload_url = from_wall_upload['upload_url']
 
     payload = {"access_token": vk_token,
                "v": version_api}
 
 
     with open(picture_file, 'rb') as pict_file:
-        pictload= {'photo': pict_file}
-        response = requests.post(upload_url, params=payload, files=pictload)
+        file_load= {'photo': pict_file}
+        response = requests.post(upload_url, params=payload, files=file_load)
         response.raise_for_status()
 
     picture_confirm =response.json()
@@ -77,12 +77,12 @@ def main():
     response = requests.post(f'https://api.vk.com/method/photos.saveWallPhoto', params=payload)
     response.raise_for_status()
 
-    picture_push=response.json()['response'][0]
+    from_save_wall=response.json()['response'][0]
 
     payload = {"access_token": vk_token,
                "v": version_api,
                "group_id": vk_group_id,
-               "attachments": f"photo{picture_push['owner_id']}_{picture_push['id']}",
+               "attachments": f"photo{from_save_wall['owner_id']}_{from_save_wall['id']}",
                "message": comment,
                }
 
