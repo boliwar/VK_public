@@ -46,7 +46,7 @@ def main():
     comment = comic["alt"]
 
     try:
-        picture_file = download_random_comic(picture_url, directory, payload=None)
+        picture_filepath = download_random_comic(picture_url, directory, payload=None)
 
         payload = {"access_token": vk_token,
                    "v": version_api,
@@ -90,9 +90,9 @@ def main():
 
         response = requests.post(f'https://api.vk.com/method/wall.post', params=payload )
         response.raise_for_status()
-        
+
     finally:
-        os.remove(picture_file)
+        os.remove(picture_filepath)
 
 if __name__ == "__main__":
     main()
