@@ -65,14 +65,14 @@ def main():
         response = requests.post(upload_url, params=payload, files=file_load)
         response.raise_for_status()
 
-    picture_confirm =response.json()
+    confirmed_picture  =response.json()
 
     payload = {"access_token": vk_token,
                "v": version_api,
                "group_id": vk_group_id,
-               "photo": picture_confirm['photo'],
-               "server": picture_confirm['server'],
-               "hash": picture_confirm['hash'],
+               "photo": confirmed_picture['photo'],
+               "server": confirmed_picture['server'],
+               "hash": confirmed_picture['hash'],
               }
     response = requests.post(f'https://api.vk.com/method/photos.saveWallPhoto', params=payload)
     response.raise_for_status()
