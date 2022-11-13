@@ -44,52 +44,55 @@ def main():
 
     picture_url = [comic["img"]]
     comment = comic["alt"]
-    picture_file = download_random_comic(picture_url, directory, payload=None)
 
-    payload = {"access_token": vk_token,
-               "v": version_api,
-               "group_id" : vk_group_id}
+    try:
+        picture_file = download_random_comic(picture_url, directory, payload=None)
 
-    response = requests.get(f'https://api.vk.com/method/photos.getWallUploadServer', params=payload)
-    response.raise_for_status()
+        payload = {"access_token": vk_token,
+                   "v": version_api,
+                   "group_id" : vk_group_id}
 
-    from_wall_upload = response.json()["response"]
-    upload_url = from_wall_upload['upload_url']
-
-    payload = {"access_token": vk_token,
-               "v": version_api}
-
-
-    with open(picture_file, 'rb') as pict_file:
-        file_load= {'photo': pict_file}
-        response = requests.post(upload_url, params=payload, files=file_load)
+        response = requests.get(f'https://api.vk.com/method/photos.getWallUploadServer', params=payload)
         response.raise_for_status()
 
-    confirmed_picture  =response.json()
+        from_wall_upload = response.json()["response"]
+        upload_url = from_wall_upload['upload_url']
 
-    payload = {"access_token": vk_token,
-               "v": version_api,
-               "group_id": vk_group_id,
-               "photo": confirmed_picture['photo'],
-               "server": confirmed_picture['server'],
-               "hash": confirmed_picture['hash'],
-              }
-    response = requests.post(f'https://api.vk.com/method/photos.saveWallPhoto', params=payload)
-    response.raise_for_status()
+        payload = {"access_token": vk_token,
+                   "v": version_api}
 
-    from_save_wall=response.json()['response'][0]
 
-    payload = {"access_token": vk_token,
-               "v": version_api,
-               "group_id": vk_group_id,
-               "attachments": f"photo{from_save_wall['owner_id']}_{from_save_wall['id']}",
-               "message": comment,
-               }
+        with open(picture_file, 'rb') as pict_file:
+            file_load= {'photo': pict_file}
+            response = requests.post(upload_url, params=payload, files=file_load)
+            response.raise_for_status()
 
-    response = requests.post(f'https://api.vk.com/method/wall.post', params=payload )
-    response.raise_for_status()
+        confirmed_picture  =response.json()
 
-    os.remove(picture_file)
+        payload = {"access_token": vk_token,
+                   "v": version_api,
+                   "group_id": vk_group_id,
+                   "photo": confirmed_picture['photo'],
+                   "server": confirmed_picture['server'],
+                   "hash": confirmed_picture['hash'],
+                  }
+        response = requests.post(f'https://api.vk.com/method/photos.saveWallPhoto', params=payload)
+        response.raise_for_status()
+
+        from_save_wall=response.json()['response'][0]
+
+        payload = {"access_token": vk_token,
+                   "v": version_api,
+                   "group_id": vk_group_id,
+                   "attachments": f"photo{from_save_wall['owner_id']}_{from_save_wall['id']}",
+                   "message": comment,
+                   }
+
+        response = requests.post(f'https://api.vk.com/method/wall.post', params=payload )
+        response.raise_for_status()
+        
+    finally:
+        os.remove(picture_file)
 
 if __name__ == "__main__":
     main()
