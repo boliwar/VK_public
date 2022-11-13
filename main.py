@@ -7,7 +7,7 @@ import random
 
 
 
-def download_pictures(picture_urls, directory, payload=None):
+def download_random_comic(picture_urls, directory, payload=None):
     url_components = urllib.parse.urlparse(picture_urls)
     file_path, file_name = os.path.split(url_components.path)
 
@@ -18,7 +18,7 @@ def download_pictures(picture_urls, directory, payload=None):
         file.write(response.content)
     return Path(directory, file_name)
 
-def get_xkcd_comics(comics_url):
+def get_xkcd_comic(comics_url):
     response = requests.get(comics_url, timeout=30)
     response.raise_for_status()
 
@@ -35,16 +35,16 @@ def main():
     header_url = f'https://xkcd.com'
     end_url = f'info.0.json'
 
-    comics = get_xkcd_comics("/".join([header_url, end_url]))
-    last_number = int(comics['num'])
+    comic = get_xkcd_comic("/".join([header_url, end_url]))
+    last_number = int(comic['num'])
 
     comics_number = str(random.randint(1, last_number))
 
-    comics = get_xkcd_comics("/".join([header_url, comics_number, end_url]))
+    comic = get_xkcd_comic("/".join([header_url, comics_number, end_url]))
 
-    picture_urls = [comics["img"]]
-    comment = comics["alt"]
-    picture_file = download_pictures(picture_urls, directory, payload=None)
+    picture_urls = [comic["img"]]
+    comment = comic["alt"]
+    picture_file = download_random_comic(picture_urls, directory, payload=None)
 
     payload = {"access_token": vk_token,
                "v": version_api,
