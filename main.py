@@ -65,7 +65,8 @@ def main():
         with open(picture_file, 'rb') as pict_file:
             file_load= {'photo': pict_file}
             response = requests.post(upload_url, params=payload, files=file_load)
-            response.raise_for_status()
+            
+        response.raise_for_status()
 
         confirmed_picture  =response.json()
 
