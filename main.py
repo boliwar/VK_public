@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import random
 
 
-
 def download_random_comic(picture_urls, directory, payload=None):
     url_components = urllib.parse.urlparse(picture_urls)
     file_path, file_name = os.path.split(url_components.path)
@@ -17,6 +16,7 @@ def download_random_comic(picture_urls, directory, payload=None):
     with open(Path(directory, file_name), 'wb') as file:
         file.write(response.content)
     return Path(directory, file_name)
+
 
 def get_xkcd_comic(comic_url):
     response = requests.get(comic_url, timeout=30)
@@ -50,7 +50,7 @@ def main():
 
         payload = {"access_token": vk_token,
                    "v": version_api,
-                   "group_id" : vk_group_id}
+                   "group_id": vk_group_id}
 
         response = requests.get(f'https://api.vk.com/method/photos.getWallUploadServer', params=payload)
         response.raise_for_status()
@@ -61,14 +61,13 @@ def main():
         payload = {"access_token": vk_token,
                    "v": version_api}
 
-
-        with open(picture_file, 'rb') as pict_file:
-            file_load= {'photo': pict_file}
+        with open(picture_filepath, 'rb') as pict_file:
+            file_load = {'photo': pict_file}
             response = requests.post(upload_url, params=payload, files=file_load)
-            
+
         response.raise_for_status()
 
-        confirmed_picture  =response.json()
+        confirmed_picture = response.json()
 
         payload = {"access_token": vk_token,
                    "v": version_api,
@@ -76,11 +75,11 @@ def main():
                    "photo": confirmed_picture['photo'],
                    "server": confirmed_picture['server'],
                    "hash": confirmed_picture['hash'],
-                  }
+                   }
         response = requests.post(f'https://api.vk.com/method/photos.saveWallPhoto', params=payload)
         response.raise_for_status()
 
-        from_save_wall=response.json()['response'][0]
+        from_save_wall = response.json()['response'][0]
 
         payload = {"access_token": vk_token,
                    "v": version_api,
@@ -89,11 +88,12 @@ def main():
                    "message": comment,
                    }
 
-        response = requests.post(f'https://api.vk.com/method/wall.post', params=payload )
+        response = requests.post(f'https://api.vk.com/method/wall.post', params=payload)
         response.raise_for_status()
 
     finally:
         os.remove(picture_filepath)
+
 
 if __name__ == "__main__":
     main()
