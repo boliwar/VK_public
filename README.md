@@ -14,6 +14,7 @@ python main.py
 ```
 VK_DEVMAN_ID=_ИД созданного приложения_
 VK_ACCESS_TOKEN= _ваш_токен_
+VK_GROUP_ID= _ваша группа_
 ```
 Токен необходимо получить в службе [API](https://vk.com/dev/implicit_flow_user).
 

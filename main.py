@@ -38,11 +38,11 @@ def get_xkcd_comics(comics_number=None):
 def main():
     load_dotenv()
     vk_token = os.environ['VK_ACCESS_TOKEN']
+    vk_group_id = os.environ['VK_GROUP_ID']
 
     directory = os.getcwd()
     version_api = "5.131"
-    vk_group_id = 217121247
-
+    
     comics = get_xkcd_comics()
     last_number = int(comics['num'])
 
