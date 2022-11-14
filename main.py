@@ -48,13 +48,13 @@ def get_upload_struct(vk_token, version_api, vk_group_id, picture_filepath):
     return response.json()
 
 
-def save_wall_photo(vk_token, version_api, vk_group_id, photo_upload_struct):
+def save_wall_photo(vk_token, version_api, vk_group_id, photo, server, hash):
     payload = {"access_token": vk_token,
                "v": version_api,
                "group_id": vk_group_id,
-               "photo": photo_upload_struct['photo'],
-               "server": photo_upload_struct['server'],
-               "hash": photo_upload_struct['hash'],
+               "photo": photo,
+               "server": server,
+               "hash": hash,
                }
     response = requests.post(f'https://api.vk.com/method/photos.saveWallPhoto', params=payload)
     response.raise_for_status()
@@ -62,11 +62,12 @@ def save_wall_photo(vk_token, version_api, vk_group_id, photo_upload_struct):
     return response.json()['response'][0]
 
 
-def posting_wall_post(vk_token, version_api, vk_group_id, from_save_wall, comment):
+def posting_wall_post(vk_token, version_api, vk_group_id, id_owner, id_user, comment):
+
     payload = {"access_token": vk_token,
                "v": version_api,
                "group_id": vk_group_id,
-               "attachments": f"photo{from_save_wall['owner_id']}_{from_save_wall['id']}",
+               "attachments": f"photo{id_owner}_{id_user}",
                "message": comment,
                }
 
@@ -95,9 +96,14 @@ def main():
 
         photo_upload_struct = get_upload_struct(vk_token, version_api, vk_group_id, picture_filepath)
 
-        answer_save_wall = save_wall_photo(vk_token, version_api, vk_group_id, photo_upload_struct)
+        photo = photo_upload_struct['photo']
+        server = photo_upload_struct['server']
+        hash = photo_upload_struct['hash']
+        answer_save_wall = save_wall_photo(vk_token, version_api, vk_group_id, photo, server, hash)
 
-        posting_wall_post(vk_token, version_api, vk_group_id, answer_save_wall, comment)
+        id_owner = answer_save_wall['owner_id']
+        id_user = answer_save_wall['id']
+        posting_wall_post(vk_token, version_api, vk_group_id, id_owner, id_user, comment)
 
     finally:
         os.remove(picture_filepath)
