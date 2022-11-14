@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import random
 
 
-def download_random_comic(picture_urls, directory, payload=None):
+def download_comic(picture_urls, directory, payload=None):
     url_components = urllib.parse.urlparse(picture_urls)
     file_path, file_name = os.path.split(url_components.path)
 
@@ -25,7 +25,7 @@ def get_xkcd_comic(comic_url):
     return comic['num'], comic["img"], comic["alt"]
 
 
-def get_wall_upload(vk_token, version_api, vk_group_id, picture_filepath):
+def get_upload_struct(vk_token, version_api, vk_group_id, picture_filepath):
     payload = {"access_token": vk_token,
                "v": version_api,
                "group_id": vk_group_id}
@@ -91,9 +91,9 @@ def main():
     last_number, picture_url, comment = get_xkcd_comic("/".join([base_url, comic_number, url_path]))
 
     try:
-        picture_filepath = download_random_comic(picture_url, directory, payload=None)
+        picture_filepath = download_comic(picture_url, directory, payload=None)
 
-        photo_upload_struct = get_wall_upload(vk_token, version_api, vk_group_id, picture_filepath)
+        photo_upload_struct = get_upload_struct(vk_token, version_api, vk_group_id, picture_filepath)
 
         answer_save_wall = save_wall_photo(vk_token, version_api, vk_group_id, photo_upload_struct)
 
