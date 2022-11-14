@@ -33,8 +33,8 @@ def get_wall_upload(vk_token, version_api, vk_group_id, picture_filepath):
     response = requests.get(f'https://api.vk.com/method/photos.getWallUploadServer', params=payload)
     response.raise_for_status()
 
-    from_wall_upload = response.json()["response"]
-    upload_url = from_wall_upload['upload_url']
+    photo_upload_address = response.json()["response"]
+    upload_url = photo_upload_address['upload_url']
 
     payload = {"access_token": vk_token,
                "v": version_api}
@@ -48,13 +48,13 @@ def get_wall_upload(vk_token, version_api, vk_group_id, picture_filepath):
     return response.json()
 
 
-def save_wall_photo(vk_token, version_api, vk_group_id, confirmed_picture):
+def save_wall_photo(vk_token, version_api, vk_group_id, photo_upload_struct):
     payload = {"access_token": vk_token,
                "v": version_api,
                "group_id": vk_group_id,
-               "photo": confirmed_picture['photo'],
-               "server": confirmed_picture['server'],
-               "hash": confirmed_picture['hash'],
+               "photo": photo_upload_struct['photo'],
+               "server": photo_upload_struct['server'],
+               "hash": photo_upload_struct['hash'],
                }
     response = requests.post(f'https://api.vk.com/method/photos.saveWallPhoto', params=payload)
     response.raise_for_status()
@@ -93,11 +93,11 @@ def main():
     try:
         picture_filepath = download_random_comic(picture_url, directory, payload=None)
 
-        confirmed_picture = get_wall_upload(vk_token, version_api, vk_group_id, picture_filepath)
+        photo_upload_struct = get_wall_upload(vk_token, version_api, vk_group_id, picture_filepath)
 
-        from_save_wall = save_wall_photo(vk_token, version_api, vk_group_id, confirmed_picture)
+        answer_save_wall = save_wall_photo(vk_token, version_api, vk_group_id, photo_upload_struct)
 
-        posting_wall_post(vk_token, version_api, vk_group_id, from_save_wall, comment)
+        posting_wall_post(vk_token, version_api, vk_group_id, answer_save_wall, comment)
 
     finally:
         os.remove(picture_filepath)
