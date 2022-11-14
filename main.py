@@ -62,7 +62,7 @@ def save_wall_photo(vk_token, version_api, vk_group_id, confirmed_picture):
     return response.json()['response'][0]
 
 
-def wall_post(vk_token, version_api, vk_group_id, from_save_wall, comment):
+def posting_wall_post(vk_token, version_api, vk_group_id, from_save_wall, comment):
     payload = {"access_token": vk_token,
                "v": version_api,
                "group_id": vk_group_id,
@@ -97,7 +97,7 @@ def main():
 
         from_save_wall = save_wall_photo(vk_token, version_api, vk_group_id, confirmed_picture)
 
-        wall_post(vk_token, version_api, vk_group_id, from_save_wall, comment)
+        posting_wall_post(vk_token, version_api, vk_group_id, from_save_wall, comment)
 
     finally:
         os.remove(picture_filepath)
