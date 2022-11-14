@@ -21,8 +21,8 @@ def download_random_comic(picture_urls, directory, payload=None):
 def get_xkcd_comic(comic_url):
     response = requests.get(comic_url, timeout=30)
     response.raise_for_status()
-
-    return response.json()
+    comic = response.json()
+    return comic['num'], comic["img"], comic["alt"]
 
 
 def get_wall_upload(vk_token, version_api, vk_group_id, picture_filepath):
@@ -84,15 +84,11 @@ def main():
     base_url = f'https://xkcd.com'
     url_path = f'info.0.json'
 
-    comic = get_xkcd_comic("/".join([base_url, url_path]))
-    last_number = int(comic['num'])
+    last_number, picture_url, comment = get_xkcd_comic("/".join([base_url, url_path]))
 
     comic_number = str(random.randint(1, last_number))
 
-    comic = get_xkcd_comic("/".join([base_url, comic_number, url_path]))
-
-    picture_url = [comic["img"]]
-    comment = comic["alt"]
+    last_number, picture_url, comment = get_xkcd_comic("/".join([base_url, comic_number, url_path]))
 
     try:
         picture_filepath = download_random_comic(picture_url, directory, payload=None)
