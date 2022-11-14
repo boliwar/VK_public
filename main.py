@@ -82,14 +82,14 @@ def main():
     directory = os.getcwd()
     version_api = "5.131"
     base_url = f'https://xkcd.com'
-    path_url = f'info.0.json'
+    url_path = f'info.0.json'
 
-    comic = get_xkcd_comic("/".join([base_url, path_url]))
+    comic = get_xkcd_comic("/".join([base_url, url_path]))
     last_number = int(comic['num'])
 
     comic_number = str(random.randint(1, last_number))
 
-    comic = get_xkcd_comic("/".join([base_url, comic_number, path_url]))
+    comic = get_xkcd_comic("/".join([base_url, comic_number, url_path]))
 
     picture_url = [comic["img"]]
     comment = comic["alt"]
