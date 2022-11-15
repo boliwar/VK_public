@@ -50,13 +50,13 @@ def get_upload_struct(vk_token, version_api, vk_group_id, picture_filepath):
     return response.json()
 
 
-def save_wall_photo(vk_token, version_api, vk_group_id, photo, server, hash):
+def save_wall_photo(vk_token, version_api, vk_group_id, response_photo, response_server, response_hash):
     payload = {"access_token": vk_token,
                "v": version_api,
                "group_id": vk_group_id,
-               "photo": photo,
-               "server": server,
-               "hash": hash,
+               "photo": response_photo,
+               "server": response_server,
+               "hash": response_hash,
                }
     response = requests.post(f'https://api.vk.com/method/photos.saveWallPhoto', params=payload)
     response.raise_for_status()
@@ -98,10 +98,10 @@ def main():
 
         photo_upload_struct = get_upload_struct(vk_token, version_api, vk_group_id, picture_filepath)
 
-        photo = photo_upload_struct['photo']
-        server = photo_upload_struct['server']
-        hash = photo_upload_struct['hash']
-        save_wall_response = save_wall_photo(vk_token, version_api, vk_group_id, photo, server, hash)
+        response_photo = photo_upload_struct['photo']
+        response_server = photo_upload_struct['server']
+        response_hash = photo_upload_struct['hash']
+        save_wall_response = save_wall_photo(vk_token, version_api, vk_group_id, response_photo, response_server, response_hash)
 
         owner_id = save_wall_response['owner_id']
         user_id = save_wall_response['id']
