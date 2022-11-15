@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import random
+import collections
 
 
 def download_comic(picture_urls, directory, payload=None):
@@ -22,7 +23,8 @@ def get_xkcd_comic(comic_url):
     response = requests.get(comic_url, timeout=30)
     response.raise_for_status()
     comic = response.json()
-    return comic['num'], comic["img"], comic["alt"]
+    comic_struct = collections.namedtuple('comic_struct', ['img', 'alt', 'num'])
+    return  comic_struct(img=comic["img"], alt=comic["alt"], num=comic['num'])
 
 
 def get_upload_struct(vk_token, version_api, vk_group_id, picture_filepath):
@@ -85,14 +87,14 @@ def main():
     base_url = f'https://xkcd.com'
     url_path = f'info.0.json'
 
-    last_number, picture_url, comment = get_xkcd_comic("/".join([base_url, url_path]))
+    comic_struct = get_xkcd_comic("/".join([base_url, url_path]))
 
-    comic_number = str(random.randint(1, last_number))
+    comic_number = str(random.randint(1, comic_struct.num))
 
-    last_number, picture_url, comment = get_xkcd_comic("/".join([base_url, comic_number, url_path]))
+    comic_struct = get_xkcd_comic("/".join([base_url, comic_number, url_path]))
 
     try:
-        picture_filepath = download_comic(picture_url, directory, payload=None)
+        picture_filepath = download_comic(comic_struct.img, directory, payload=None)
 
         photo_upload_struct = get_upload_struct(vk_token, version_api, vk_group_id, picture_filepath)
 
@@ -103,7 +105,7 @@ def main():
 
         id_owner = answer_save_wall['owner_id']
         id_user = answer_save_wall['id']
-        posting_wall_post(vk_token, version_api, vk_group_id, id_owner, id_user, comment)
+        posting_wall_post(vk_token, version_api, vk_group_id, id_owner, id_user, comic_struct.alt)
 
     finally:
         os.remove(picture_filepath)
