@@ -35,8 +35,8 @@ def get_upload_struct(vk_token, version_api, vk_group_id, picture_filepath):
     response = requests.get(f'https://api.vk.com/method/photos.getWallUploadServer', params=payload)
     response.raise_for_status()
 
-    photo_upload_address = response.json()["response"]
-    upload_url = photo_upload_address['upload_url']
+    photo_upload_response = response.json()["response"]
+    upload_url = photo_upload_response['upload_url']
 
     payload = {"access_token": vk_token,
                "v": version_api}
