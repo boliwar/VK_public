@@ -65,10 +65,11 @@ def save_wall_photo(vk_token, version_api, vk_group_id, response_photo, response
 
 
 def post_on_wall(vk_token, version_api, vk_group_id, id_owner, id_user, comment):
-
+    from_group = 1
     payload = {"access_token": vk_token,
                "v": version_api,
-               "group_id": vk_group_id,
+               "owner_id": -int(vk_group_id),
+               "from_group": from_group,
                "attachments": f"photo{id_owner}_{id_user}",
                "message": comment,
                }
@@ -76,7 +77,7 @@ def post_on_wall(vk_token, version_api, vk_group_id, id_owner, id_user, comment)
     response = requests.post(f'https://api.vk.com/method/wall.post', params=payload)
     response.raise_for_status()
 
-
+    
 def main():
     load_dotenv()
     vk_token = os.environ['VK_ACCESS_TOKEN']
