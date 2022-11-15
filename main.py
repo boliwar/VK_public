@@ -101,11 +101,11 @@ def main():
         photo = photo_upload_struct['photo']
         server = photo_upload_struct['server']
         hash = photo_upload_struct['hash']
-        answer_save_wall = save_wall_photo(vk_token, version_api, vk_group_id, photo, server, hash)
+        save_wall_response = save_wall_photo(vk_token, version_api, vk_group_id, photo, server, hash)
 
-        id_owner = answer_save_wall['owner_id']
-        id_user = answer_save_wall['id']
-        post_on_wall(vk_token, version_api, vk_group_id, id_owner, id_user, comic_struct.alt)
+        owner_id = save_wall_response['owner_id']
+        user_id = save_wall_response['id']
+        post_on_wall(vk_token, version_api, vk_group_id, owner_id, user_id, comic_struct.alt)
 
     finally:
         os.remove(picture_filepath)
